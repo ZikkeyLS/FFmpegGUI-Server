@@ -101,17 +101,18 @@ internal class Program
         string key = message.GetString();
 
         ushort status = 3;
+        KeyStatus keyStatus = null;
 
         // also check is used, then link user to server.
         if (_keys.ContainsKey(key))
         {
-            string id = _keys.LinkedID(key);
+            keyStatus = _keys.Find(key);
 
-            if (id == userID)
+            if (keyStatus.userID == userID)
             {
                 status = 0;
             }
-            else if(id != "")
+            else if(keyStatus.userID != "")
             {
                 status = 2;
             }
@@ -124,14 +125,14 @@ internal class Program
         else
             status = 1;
 
-        ResponseAuthorization(fromClientId, status);
+        ResponseAuthorization(fromClientId, status, keyStatus != null ? keyStatus.expirationTime : DateTime.MinValue);
     }
 
-    private static void ResponseAuthorization(ushort fromClientId, ushort status)
+    private static void ResponseAuthorization(ushort fromClientId, ushort status, DateTime expiration)
     {
         Message message = Message.Create(MessageSendMode.Reliable, MessageId.ResponseAuthorization);
         message.AddUShort(status);
-        // message.AddLong(keyLifetime)
+        message.AddLong(expiration.Ticks);
 
         _server.Send(message, fromClientId);
     }

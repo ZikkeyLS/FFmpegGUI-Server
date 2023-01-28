@@ -77,6 +77,11 @@ namespace FFmpegGUI_Server
             return key;
         }
 
+        public KeyStatus Find(string key)
+        {
+            return _keys.Find((keyStatus) => keyStatus.key == key);
+        }
+
         public string LinkedID(string key)
         {
             return _keys.Find((keyStatus) => keyStatus.key == key).userID;
@@ -120,11 +125,11 @@ namespace FFmpegGUI_Server
         {
             bool ok = false;
 
-            _keys.ForEach((keyStatus) =>
+            foreach(KeyStatus keyStatus in _keys)
             {
                 if (keyStatus.key == key)
                     ok = true;
-            });
+            }
 
             return ok;
         }
